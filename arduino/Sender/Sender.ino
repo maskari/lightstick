@@ -24,7 +24,7 @@
 #define LEDS 5
 
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(LEDS, PIN, NEO_GRB + NEO_KHZ800);
-int leds = LEDS;
+int leds = LEDS-1;
 byte red;
 byte green;
 byte blue;
@@ -58,14 +58,14 @@ void loop() {
  // i=0;
   // if there's any serial available, read it:
   while (Serial.available() > 0) {
-     Serial.print("LED being served = ");
-     Serial.println(i);
+
     // look for the next valid integer in the incoming serial stream:
       red = Serial.parseInt(); 
     // do it again:
       green = Serial.parseInt(); 
     // do it again:
        blue = Serial.parseInt();
+       delay(1);
 
     // look for the newline. That's the end of your
     // sentence:
@@ -74,7 +74,10 @@ void loop() {
       // if you're using a common-cathode LED, just use "constrain(color, 0, 255);"
 //      red = constrain(red, 0, 255);
 //      green = constrain(green, 0, 255);
-//      blue = constrain(blue, 0, 255);
+//      blue = constrain(blue, 0, 255);     
+         Serial.print("LED being served = ");
+         Serial.println(i);
+       
 
       // fade the red, green, and blue legs of the LED: 
       
