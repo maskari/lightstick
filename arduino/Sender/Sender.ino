@@ -21,13 +21,14 @@
 #include <OneSheeld.h>
 
 #define PIN 6
-#define LEDS 2
+#define LEDS 5
 
-Adafruit_NeoPixel strip = Adafruit_NeoPixel(LEDS+1, PIN, NEO_GRB + NEO_KHZ800);
-
-int red;
-int green;
-int blue;
+Adafruit_NeoPixel strip = Adafruit_NeoPixel(LEDS, PIN, NEO_GRB + NEO_KHZ800);
+int leds = LEDS;
+byte red;
+byte green;
+byte blue;
+int i;
 // pins for the LEDs:
 //const int red = 3;
 //const int green = 5;
@@ -39,6 +40,9 @@ void setup() {
   strip.begin();
   strip.setPixelColor(0,12,12,12);
      strip.show(); // Initialize all pixels to 'off'
+     Serial.print("number of LEDS in strip:");
+     Serial.println(LEDS);
+     i=0;
   // make the pins outputs:
 //  pinMode(redPin, OUTPUT); 
 //  pinMode(greenPin, OUTPUT); 
@@ -50,9 +54,12 @@ void loop() {
   red = 0;
   green=0;
   blue= 0;
+  
+ // i=0;
   // if there's any serial available, read it:
   while (Serial.available() > 0) {
-
+     Serial.print("LED being served = ");
+     Serial.println(i);
     // look for the next valid integer in the incoming serial stream:
       red = Serial.parseInt(); 
     // do it again:
@@ -74,7 +81,7 @@ void loop() {
 //      analogWrite(redPin, red);
 //      analogWrite(greenPin, green);
 //      analogWrite(bluePin, blue);
-      strip.setPixelColor(2,red,green,blue);
+      strip.setPixelColor(i,red,green,blue);
       strip.show();
 
       // print the three numbers in one string as hexadecimal:
@@ -84,6 +91,11 @@ void loop() {
       Serial.println(green);
       Serial.print("B=");
       Serial.println(blue);
+     
+     if(i==leds)
+     i=0;
+     else
+     i=i+1;
     }
   }
 }
