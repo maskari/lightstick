@@ -1,38 +1,24 @@
-/*
-  Reading a serial ASCII-encoded string.
- 
- This sketch demonstrates the Serial parseInt() function.
- It looks for an ASCII string of comma-separated values.
- It parses them into ints, and uses those to fade an RGB LED.
- 
- Circuit: Common-anode RGB LED wired like so:
- * Red cathode: digital pin 3
- * Green cathode: digital pin 5
- * blue cathode: digital pin 6
- * anode: +5V
- 
- created 13 Apr 2012
- by Tom Igoe
- 
- This example code is in the public domain.
- */
  
 #include <Adafruit_NeoPixel.h>
 #include <OneSheeld.h>
+#include <SD.h>
 
 #define PIN 6
 #define LEDS 5
 
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(LEDS, PIN, NEO_GRB + NEO_KHZ800);
-int leds = LEDS-1;
+const int leds = LEDS-1;
 byte red;
 byte green;
 byte blue;
-int i;
-// pins for the LEDs:
-//const int red = 3;
-//const int green = 5;
-//const int blue = 6;
+int columns;
+int rows;
+byte width;
+File myFile;
+int colorcount=0;
+const int chipSelect = 10; 
+const bool debug=1;
+
 
 void setup() {
   // initialize serial:
@@ -42,41 +28,60 @@ void setup() {
      strip.show(); // Initialize all pixels to 'off'
      Serial.print("number of LEDS in strip:");
      Serial.println(LEDS);
-     i=0;
-  // make the pins outputs:
-//  pinMode(redPin, OUTPUT); 
-//  pinMode(greenPin, OUTPUT); 
-//  pinMode(bluePin, OUTPUT); 
+      width=0;
+     
+      Serial.print("Initializing SD card...");
+      // On the Ethernet Shield, CS is pin 4. It's set as an output by default.
+      // Note that even if it's not used as the CS pin, the hardware SS pin 
+      // (10 on most Arduino boards, 53 on the Mega) must be left as an output 
+      // or the SD library functions will not work. 
+       pinMode(10, OUTPUT);
+       if (!SD.begin(10)) {
+        Serial.println("initialization failed!");
+        return;
+      }
+      Serial.println("initialization done.");
+       myFile = SD.open("light.txt");
+       width=myFile.read();
 
 }
 
+  
+
 void loop() {
+  if(debug==1)
+  Serial.println("entering mainloop");
   red = 0;
   green=0;
   blue= 0;
-  
+ 
  // i=0;
   // if there's any serial available, read it:
-  while (Serial.available() > 0) {
-
+  if (myFile) {
+    Serial.println("test.txt:");
+    
+    // read from the file until there's nothing else in it:
+    while (myFile.available()) {
+    	//Serial.write(myFile.read());
+    for(rows=0;rows<<width;rows++){
+    for(columns=0;columns<<leds;columns++){
+      
     // look for the next valid integer in the incoming serial stream:
-      red = Serial.parseInt(); 
-    // do it again:
-      green = Serial.parseInt(); 
-    // do it again:
-       blue = Serial.parseInt();
+    for(colorcount=0;colorcount<<3;colorcount++){
+      
+      if(colorcount==0)
+      red=myFile.read();
+      else if(colorcount==1)
+      green=myFile.read();
+      else if(colorcount==2)
+      blue=myFile.read();
+    
+      
+      }
        delay(1);
-
-    // look for the newline. That's the end of your
-    // sentence:
-    if (Serial.read() == '\n') {
-      // constrain the values to 0 - 255 and invert
-      // if you're using a common-cathode LED, just use "constrain(color, 0, 255);"
-//      red = constrain(red, 0, 255);
-//      green = constrain(green, 0, 255);
-//      blue = constrain(blue, 0, 255);     
+    
          Serial.print("LED being served = ");
-         Serial.println(i);
+         Serial.println(columns);
        
 
       // fade the red, green, and blue legs of the LED: 
@@ -84,7 +89,7 @@ void loop() {
 //      analogWrite(redPin, red);
 //      analogWrite(greenPin, green);
 //      analogWrite(bluePin, blue);
-      strip.setPixelColor(i,red,green,blue);
+      strip.setPixelColor(columns,red,green,blue);
       strip.show();
 
       // print the three numbers in one string as hexadecimal:
@@ -94,13 +99,17 @@ void loop() {
       Serial.println(green);
       Serial.print("B=");
       Serial.println(blue);
+    }  
+   delay(2000);
      
-     if(i==leds)
-     i=0;
-     else
-     i=i+1;
     }
+     myFile.close();
+    }
+    
   }
+  //break;
+   if(debug==1)
+  Serial.println("failed to find file");
 }
 
 
