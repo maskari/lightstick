@@ -55,6 +55,8 @@ void setup()
   else
   Serial.println("card initialized.");
    File dataFile = SD.open("light.txt");
+   if(dataFile == 1)
+   Serial.println("file opened");
   
   // open the file. note that only one file can be open at a time,
   // so you have to close this one before opening another.
@@ -75,22 +77,28 @@ void loop()
 {
   
  
- // if(debug==1)
-  //Serial.println("entering mainloop");
-  red = 0;
-  green=0;
-  blue= 0;
- 
+
+//  red = 0;
+//  green=0;
+//  blue= 0;
+   //if(debug==1)
+ // Serial.println("entering mainloop");
  // i=0;
   // if there's any serial available, read it:
-  if (dataFile) {
+  if (dataFile==1)
+  Serial.println("datafile available");
+  else
+  Serial.println("datafile NOT available");
+  
+  
+  if (dataFile==1) {
     
     if(debug==1)
     Serial.println("light.txt:");
     
     // read from the file until there's nothing else in it:
     while (dataFile.available()) {
-    	//Serial.write(myFile.read());
+    	Serial.write(dataFile.read());
     
     for(columns=0;columns<<leds;columns++){
       Serial.println("LED being served = ");
